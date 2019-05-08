@@ -1,10 +1,9 @@
-*
+*.*
 
 !.gitignore
-!.py
-!.hpp
-!.h
-!.c
-!.cpp
+!*.py
+!*.hpp
+!*.h
+!*.c
+!*.cpp
 
-!*/
