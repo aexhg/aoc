@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
 #include <vector>
+#include <boost/algorithm/string/join.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
@@ -13,6 +15,14 @@ struct Robo {
 	int id;
 	bool output;
 	std::vector<int> values;
+
+	int min() const {
+		return *std::min_element(values.begin(), values.end());
+	}
+	
+	int max() const {
+		return *std::max_element(values.begin(), values.end());
+	}
 };
 
 //enum Edge { MIN, MAX };
@@ -152,14 +162,36 @@ int main(int argv, char* argc[]){
 
 	for(auto it = vertices.rbegin(); it != vertices.rend(); ++it){
 		auto vType = G[*it].output ? "Output" : "Vertex";
-		std::cout << vType << ": " << G[*it].id << std::endl;
+		//std::cout << vType << ": " << G[*it].id << std::endl;
 		auto rng = boost::out_edges(*it, G);
+		//std::cout << "   " << boost::algorithm::join(G[*it].values, " ,");
+		//for(auto& v : G[*it].values){
+		//	std::cout << "   " << v << ", ";
+		//}
+		//std::cout << std::endl;
+		const auto& v = G[*it].values;
+		if(std::find(v.begin(), v.end(), 61) != v.end() && std::find(v.begin(), v.end(), 17) != v.end()){
+			std::cout << "bot: " << G[*it].id << std::endl;
+		}
+
+		const auto& robo = G[*it];
+
+		if(robo.output && (robo.id == 0 || robo.id == 1 || robo.id == 2)){
+			std::cout << "Id: " << robo.id << ", Output: " << robo.output << std::endl;
+			for(auto& v : robo.values){
+				std::cout << "   " << v << ", ";
+		
+			}
+		}
+
+	
 		for(auto ir = rng.first; ir != rng.second; ++ir){
 			auto lowhigh = G[*ir].edgeType == EdgeType::LOW ? "LOW" : "HIGH";
 			auto target = boost::target(*ir, G);
 			auto vType2 = G[target].output ? "Output" : "Vertex";
 
-			std::cout << "   " << lowhigh << " " << vType2 << "  range: " << G[target].id << std::endl;
+			G[target].values.push_back(G[*ir].edgeType == EdgeType::LOW ? G[*it].min() : G[*it].max());
+			//std::cout << "   " << lowhigh << " " << vType2 << "  range: " << G[target].id << std::endl;
 		}
 	}
 
